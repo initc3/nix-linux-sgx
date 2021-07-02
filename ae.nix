@@ -128,7 +128,7 @@ stdenvNoCC.mkDerivation {
   meta = with lib; {
     description = "Intel SGX Architectural Enclaves (AEs) for Linux";
     homepage = "https://github.com/intel/linux-sgx";
-    maintainers = [ maintainers.sbellem ];
+    #maintainers = [ maintainers.sbellem ];
     platforms = platforms.linux;
     license = with licenses; [ bsd3 ];
   };
