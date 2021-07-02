@@ -1,4 +1,4 @@
-name: Build Linux SGX SDK
+name: Build Linux SGX SDK, IPP-Crypto and AEs
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_sdk:
+  build_sgxsdk:
     if: github.repository == 'initc3/nix-linux-sgx'
     runs-on: ubuntu-latest
     steps:
@@ -26,8 +26,8 @@ jobs:
         with:
           name: initc3
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - run: nix-build -A sdk
-  build_ipp:
+      - run: nix-build -A sgxsdk
+  build_ipp-crypto:
     if: github.repository == 'initc3/nix-linux-sgx'
     runs-on: ubuntu-latest
     steps:
@@ -44,8 +44,8 @@ jobs:
         with:
           name: initc3
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - run: nix-build -A ipp
-  build_ae:
+      - run: nix-build -A ipp-crypto
+  build_sgx-ae:
     if: github.repository == 'initc3/nix-linux-sgx'
     runs-on: ubuntu-latest
     steps:
@@ -62,4 +62,4 @@ jobs:
         with:
           name: initc3
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - run: nix-build -A ae
+      - run: nix-build -A sgx-ae
