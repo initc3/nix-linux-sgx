@@ -89,7 +89,7 @@ stdenvNoCC.mkDerivation {
   meta = with lib; {
     description = "Intel SGX SDK for Linux built with IPP Crypto Library";
     homepage = "https://github.com/intel/linux-sgx";
-    maintainers = [ maintainers.sbellem ];
+    #maintainers = [ maintainers.sbellem ];
     platforms = platforms.linux;
     license = with licenses; [ bsd3 ];
   };
