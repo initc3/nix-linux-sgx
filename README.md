@@ -73,3 +73,23 @@ cachix use initc3
 
 Invoking `nix-build` to build your derivation should automatically pull
 the sgxsdk binary dependency from the cache.
+
+
+## A note about the Architectural Enclaves (ae.nix)
+The Architectural Enclaves are enclaves that Intel provides, and are
+normally built from source and signed by Intel. Intel provides a
+[toolchain][toolchain] to verify their reproducibility, but this toolchain
+is arguably cumbersome.
+
+In an attempt to improve this existing toolchain, `ae.nix` is meant to be a
+stepping stone towards a different approach that could be used by both Intel
+and a verifier.
+
+In this approach, both Intel and a verifier would simply run `nix-build` to
+build the enclaves, and sign them afterwards with their respective private
+keys. A verifier would then follow
+[Verify Intel(R) Prebuilt AE Reproducibility][verify-ae] to verify that the
+enclaves they've built match the ones provided by Intel.
+
+[toolchain]: https://github.com/intel/linux-sgx/tree/master/linux/reproducibility
+[verify-ae]: https://github.com/intel/linux-sgx/tree/master/linux/reproducibility/ae_reproducibility_verifier
