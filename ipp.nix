@@ -1,30 +1,28 @@
-{ lib,
-  stdenvNoCC,
-  fetchpatch,
-  fetchurl,
-  fetchFromGitHub,
-  autoconf,
-  automake,
-  binutils,
-  bison,
-  cmake,
-  file,
-  flex,
-  gcc,
-  git,
-  gnumake,
-  gnum4,
-  libtool,
-  nasm,
-  ocaml,
-  ocamlPackages,
-  openssl,
-  perl,
-  python3,
-  texinfo
+{ lib
+, stdenv
+, fetchpatch
+, fetchurl
+, fetchFromGitHub
+, autoconf
+, automake
+, binutils
+, bison
+, cmake
+, file
+, flex
+, git
+, gnum4
+, libtool
+, nasm
+, ocaml
+, ocamlPackages
+, openssl
+, perl
+, python3
+, texinfo
 }:
 
-stdenvNoCC.mkDerivation {
+stdenv.mkDerivation {
   pname = "ippcrypto";
   version = "ippcp_2020u3";
   src = fetchFromGitHub {
@@ -37,61 +35,65 @@ stdenvNoCC.mkDerivation {
   patches = [
     (fetchpatch {
       name = "replace-bin-cp-with-cp.patch";
-      url = "https://github.com/intel/linux-sgx/pull/730.patch";
+      url = "https://github.com/intel/linux-sgx/commit/e0db5291d46d1c124980719d63829d65f89cf2c7.patch";
       sha256 = "0xwlpm1r4rl4anfhjkr6fgz0gcyhr0ng46fv8iw9hfsh891yqb7z";
     })
     (fetchpatch {
-      name = "ipp-crypto-makefile.patch";
-      url = "https://github.com/intel/linux-sgx/pull/731.patch";
-      sha256 = "1q9rsygm92kiwdj81yxp9q182rgb19kxir2m2r9l73hxwfz1cc0a";
+      name = "sgx_ippcp.h.patch";
+      url = "https://github.com/intel/linux-sgx/commit/e5929083f8161a8e7404afc0577936003fbb9d0b.patch";
+      sha256 = "12bgs9rxlq82hn5prl9qz2r4mwypink8hzdz4cki4k4cmkw961f5";
     })
+    (fetchpatch {
+      name = "ipp-crypto-makefile.patch";
+      url = "https://github.com/intel/linux-sgx/commit/b1e1b2e9743c21460c7ab7637099818f656f9dd3.patch";
+      sha256 = "14h6xkk7m89mkjc75r8parll8pmq493incq5snwswsbdzibrdi68";
+    })
+  ];
+  nativeBuildInputs = [
+    autoconf
+    automake
+    bison
+    cmake
+    file
+    flex
+    git
+    gnum4
+    libtool
+    nasm
+    ocaml
+    ocamlPackages.ocamlbuild
+    openssl
+    perl
+    texinfo
   ];
   buildInputs = [
     binutils
-    autoconf
-    automake
-    libtool
-    ocaml
-    ocamlPackages.ocamlbuild
-    file
-    cmake
-    gnum4
-    openssl
-    gcc
-    gnumake
-    texinfo
-    bison
-    flex
-    perl
     python3
-    git
-    nasm
   ];
   dontConfigure = true;
   # sgx expects binutils to be under /usr/local/bin by default
   preBuild = ''
     export BINUTILS_DIR=${binutils}/bin
-    '';
+  '';
   buildPhase = ''
     runHook preBuild
 
     cd external/ippcp_internal/
     make
+    make clean
     make MITIGATION-CVE-2020-0551=LOAD
     make clean
     make MITIGATION-CVE-2020-0551=CF
 
     runHook postBuild
-    '';
-  postBuild = ''
+  '';
+  installPhase = ''
     mkdir -p $out
     cp -r ./lib $out/lib
     cp -r ./inc $out/inc
     cp -r ./license $out/license
     ls -l ./inc/
   '';
-  dontInstall = true;
-  dontFixup = true;
 
   meta = with lib; {
     description = "Intel IPP Crypto library for SGX";

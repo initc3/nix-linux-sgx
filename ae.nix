@@ -1,32 +1,28 @@
-{ lib,
-  stdenvNoCC,
-  fetchpatch,
-  fetchurl,
-  fetchFromGitHub,
-  autoconf,
-  automake,
-  binutils,
-  bison,
-  cmake,
-  file,
-  flex,
-  gcc,
-  git,
-  gnumake,
-  gnum4,
-  libtool,
-  nasm,
-  ocaml,
-  ocamlPackages,
-  openssl,
-  perl,
-  python3,
-  texinfo,
-  wget,
-  which
+{ lib
+, stdenv
+, fetchpatch
+, fetchurl
+, fetchFromGitHub
+, autoconf
+, automake
+, binutils
+, bison
+, cmake
+, file
+, flex
+, git
+, gnum4
+, libtool
+, nasm
+, ocaml
+, ocamlPackages
+, openssl
+, perl
+, python3
+, texinfo
 }:
 
-stdenvNoCC.mkDerivation {
+stdenv.mkDerivation {
   pname = "sgxae";
   version = "2.14a0";
   src = fetchFromGitHub {
@@ -38,48 +34,50 @@ stdenvNoCC.mkDerivation {
   };
   dontConfigure = true;
   prePatch = ''
-    patchShebangs ./linux/installer/bin/build-installpkg.sh
-    patchShebangs ./linux/installer/common/sdk/createTarball.sh
-    patchShebangs ./linux/installer/common/sdk/install.sh
-    '';
+    patchShebangs ./linux/installer/bin/build-installpkg.sh \
+      ./linux/installer/common/sdk/{createTarball.sh,install.sh}
+  '';
   patches = [
     (fetchpatch {
       name = "replace-bin-cp-with-cp.patch";
-      url = "https://github.com/intel/linux-sgx/pull/730.patch";
+      url = "https://github.com/intel/linux-sgx/commit/e0db5291d46d1c124980719d63829d65f89cf2c7.patch";
       sha256 = "0xwlpm1r4rl4anfhjkr6fgz0gcyhr0ng46fv8iw9hfsh891yqb7z";
     })
     (fetchpatch {
+      name = "sgx_ippcp.h.patch";
+      url = "https://github.com/intel/linux-sgx/commit/e5929083f8161a8e7404afc0577936003fbb9d0b.patch";
+      sha256 = "12bgs9rxlq82hn5prl9qz2r4mwypink8hzdz4cki4k4cmkw961f5";
+    })
+    (fetchpatch {
       name = "ipp-crypto-makefile.patch";
-      url = "https://github.com/intel/linux-sgx/pull/731.patch";
-      sha256 = "1q9rsygm92kiwdj81yxp9q182rgb19kxir2m2r9l73hxwfz1cc0a";
+      url = "https://github.com/intel/linux-sgx/commit/b1e1b2e9743c21460c7ab7637099818f656f9dd3.patch";
+      sha256 = "14h6xkk7m89mkjc75r8parll8pmq493incq5snwswsbdzibrdi68";
     })
   ];
-  buildInputs = [
+  nativeBuildInputs = [
     autoconf
     automake
-    binutils
     bison
     cmake
+    libtool
     file
     flex
-    gcc
     git
-    gnumake
     gnum4
-    libtool
+    nasm
     ocaml
     ocamlPackages.ocamlbuild
     openssl
     perl
-    python3
     texinfo
-    nasm
-    wget
-    which
+  ];
+  buildInputs = [
+    binutils
+    python3
   ];
   preBuild = ''
     export BINUTILS_DIR=${binutils}/bin
-    '';
+  '';
   buildPhase = ''
     runHook preBuild
 
@@ -125,7 +123,7 @@ stdenvNoCC.mkDerivation {
     #echo "DONE building qve.so"
 
     runHook postBuild
-    '';
+  '';
   postBuild = ''
     mkdir $out/ae
     cp ./psw/ae/le/le.so $out/ae/
@@ -134,9 +132,8 @@ stdenvNoCC.mkDerivation {
     cp ./psw/ae/qe/qe.so $out/ae/
     cp ./external/dcap_source/QuoteGeneration/quote_wrapper/quote/enclave/linux/qe3.so $out/ae/
     #cp ./external/dcap_source/QuoteVerification/QvE/qve.so $out/ae/
-    '';
+  '';
   dontInstall = true;
-  dontFixup = true;
 
   meta = with lib; {
     description = "Intel SGX Architectural Enclaves (AEs) for Linux";

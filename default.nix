@@ -3,7 +3,7 @@ let
   pkgs = import sources.nixpkgs { };
   
   sgx = with pkgs; {
-    sgxsdk = callPackage ./sdk.nix { };
+    sgx-sdk = callPackage ./sdk.nix { };
     ipp-crypto = callPackage ./ipp.nix { };
     sgx-ae = callPackage ./ae.nix { };
   };
