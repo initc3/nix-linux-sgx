@@ -23,7 +23,7 @@ jobs:
         with:
           name: sgx
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-      - run: nix-build -A sgxsdk
+      - run: nix-build -A sgx-sdk
   build_ipp-crypto:
     runs-on: ubuntu-latest
     steps:
